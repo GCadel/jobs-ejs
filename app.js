@@ -4,14 +4,11 @@ require("dotenv").config();
 const flash = require("connect-flash");
 const passport = require("passport");
 const passportInit = require("./passport/passportInit");
+const auth = require("./middleware/auth");
 
 passportInit();
 
 const app = express();
-const user = null;
-
-app.use(passport.initialize());
-app.use(passport.session());
 
 // Session config
 
@@ -39,6 +36,8 @@ if (app.get("env") === "production") {
   sessionParams.cookie.secure = true;
 }
 app.use(session(sessionParams));
+app.use(passport.initialize());
+app.use(passport.session());
 
 app.use(flash());
 app.set("view engine", "ejs");
@@ -50,28 +49,8 @@ app.get("/", (req, res) => {
 app.use("/sessions", require("./routes/sessionRoutes"));
 
 // secret word handling
-// let secretWord = "syzygy";
-app.get("/secretWord", (req, res) => {
-  // Set the user session keyword
-  if (!req.session.secretWord) {
-    req.session.secretWord = "syzygy";
-  }
-  res.locals.info = req.flash("info");
-  res.locals.errors = req.flash("errors");
-  res.render("secretWord", {
-    secretWord: req.session.secretWord,
-  });
-});
-app.post("/secretWord", (req, res) => {
-  if (req.body.secretWord.toUpperCase()[0] == "P") {
-    req.flash("errors", "That word won't work");
-    req.flash("errors", "You can't use words that start with 'p'.");
-  } else {
-    req.session.secretWord = req.body.secretWord;
-    req.flash("info", "The secret word was changed");
-  }
-  res.redirect("/secretWord");
-});
+const secretWordRouter = require("./routes/secretWord");
+app.use("/secretWord", auth, secretWordRouter);
 
 app.use((req, res) => {
   res.status(404).send(`That page (${req.url}) was not found.`);

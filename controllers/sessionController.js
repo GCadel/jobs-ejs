@@ -1,5 +1,7 @@
 const User = require("../models/User");
 const parseVErr = require("../utils/parseValidationErr");
+const flash = require("connect-flash");
+flash();
 
 const registerShow = (req, res) => {
   res.render("register");
@@ -7,7 +9,7 @@ const registerShow = (req, res) => {
 
 const registerDo = async (req, res, next) => {
   if (req.body.password != req.body.confPassword) {
-    req.flash("error", "Passwords do not match.");
+    req.flash("errors", "Passwords do not match.");
     return res.render("register", { errors: flash("errors") });
   }
 
@@ -17,7 +19,7 @@ const registerDo = async (req, res, next) => {
     if (error.constructor.name === "ValidationError") {
       parseVErr(error, req);
     } else if (error.name === "MongoServerError" && error.code === 11000) {
-      req.flash("error", "That email is already registered");
+      req.flash("errors", "That email is already registered");
     } else {
       return next(e);
     }
