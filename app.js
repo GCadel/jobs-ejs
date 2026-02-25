@@ -2,10 +2,19 @@ const express = require("express");
 require("express-async-errors");
 require("dotenv").config();
 const flash = require("connect-flash");
+const passport = require("passport");
+const passportInit = require("./passport/passportInit");
+
+passportInit();
 
 const app = express();
+const user = null;
+
+app.use(passport.initialize());
+app.use(passport.session());
 
 // Session config
+
 const session = require("express-session");
 const MongoDBStore = require("connect-mongodb-session")(session);
 
@@ -34,6 +43,11 @@ app.use(session(sessionParams));
 app.use(flash());
 app.set("view engine", "ejs");
 app.use(require("body-parser").urlencoded({ extended: true }));
+app.use(require("./middleware/storeLocals"));
+app.get("/", (req, res) => {
+  res.render("index");
+});
+app.use("/sessions", require("./routes/sessionRoutes"));
 
 // secret word handling
 // let secretWord = "syzygy";
@@ -72,6 +86,7 @@ const port = process.env.PORT || 3000;
 
 const start = async () => {
   try {
+    await require("./db/connect")(process.env.MONGO);
     app.listen(port, () =>
       console.log(`Server is listening on port ${port}...`),
     );
