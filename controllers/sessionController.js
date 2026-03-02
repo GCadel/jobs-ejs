@@ -1,7 +1,5 @@
 const User = require("../models/User");
 const parseVErr = require("../utils/parseValidationErr");
-const flash = require("connect-flash");
-flash();
 
 const registerShow = (req, res) => {
   res.render("register");
@@ -40,11 +38,10 @@ const logonShow = (req, res) => {
   if (req.user) {
     return res.redirect("/");
   }
-  res.render("logon");
-  // res.render("logon", {
-  //   errors: req.flash("error"),
-  //   info: req.flash("info"),
-  // });
+  res.render("logon", {
+    errors: req.flash("error"),
+    info: req.flash("info"),
+  });
 };
 
 module.exports = { registerShow, registerDo, logonShow, logoff };
