@@ -1,31 +1,25 @@
-const express = require("express");
-require("express-async-errors");
 require("dotenv").config();
-const flash = require("connect-flash");
-const passport = require("passport");
-const passportInit = require("./passport/passportInit");
-const auth = require("./middleware/auth");
-
-passportInit();
-
+require("express-async-errors");
+const express = require("express");
+const expressSession = require("express-session");
+const MongoDBStore = require("connect-mongodb-session")(expressSession);
 const app = express();
 
-// Session config
-
-const session = require("express-session");
-const MongoDBStore = require("connect-mongodb-session")(session);
+app.use(require("body-parser").urlencoded({ extended: true }));
+app.set("view engine", "ejs");
 
 const store = new MongoDBStore({
   uri: process.env.MONGO,
   collection: "SessionEjs",
 });
+
 store.on("error", function (err) {
   console.log(err);
 });
 
 const sessionParams = {
   secret: process.env.SESSION_SECRET,
-  resave: false,
+  resave: true,
   saveUninitialized: true,
   store: store,
   cookie: { secure: false, sameSite: "strict" },
@@ -35,22 +29,28 @@ if (app.get("env") === "production") {
   app.set("trust proxy", 1);
   sessionParams.cookie.secure = true;
 }
-app.use(session(sessionParams));
+
+app.use(expressSession(sessionParams));
+
+const passport = require("passport");
+const passportInit = require("./passport/passportInit");
+passportInit();
+
 app.use(passport.initialize());
 app.use(passport.session());
 
-app.use(flash());
-app.set("view engine", "ejs");
-app.use(require("body-parser").urlencoded({ extended: true }));
+app.use(require("connect-flash")());
+
 app.use(require("./middleware/storeLocals"));
+
 app.get("/", (req, res) => {
   res.render("index");
 });
+
 app.use("/sessions", require("./routes/sessionRoutes"));
 
-// secret word handling
-const secretWordRouter = require("./routes/secretWord");
-app.use("/secretWord", auth, secretWordRouter);
+const auth = require("./middleware/auth");
+app.use("/secretWord", auth, require("./routes/secretWord"));
 
 app.use((req, res) => {
   res.status(404).send(`That page (${req.url}) was not found.`);
