@@ -11,7 +11,12 @@ app.use(require("body-parser").urlencoded({ extended: true }));
 app.set("view engine", "ejs");
 app.use(require("helmet")());
 app.use(require("xss-clean")());
-app.use(require("express-rate-limit")());
+app.use(
+  require("express-rate-limit").rateLimit({
+    windowMs: 15 * 60 * 1000,
+    max: 100,
+  }),
+);
 app.use(cookieParser(process.env.SESSION_SECRET));
 app.use(csrf.csrf());
 
@@ -49,6 +54,8 @@ app.use(passport.session());
 app.use(require("connect-flash")());
 
 app.use(require("./middleware/storeLocals"));
+
+app.use(csrf.csrf());
 
 app.use((req, res, next) => {
   res.locals._csrf = csrf.getToken(req, res);

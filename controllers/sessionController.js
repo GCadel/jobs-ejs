@@ -1,5 +1,6 @@
 const User = require("../models/User");
 const parseVErr = require("../utils/parseValidationErr");
+const csrf = require("host-csrf");
 
 const registerShow = (req, res) => {
   res.render("register");
@@ -27,6 +28,7 @@ const registerDo = async (req, res, next) => {
 };
 
 const logoff = (req, res) => {
+  csrf.clearToken(req, res);
   req.session.destroy(function (err) {
     if (err) {
       console.log(err);
