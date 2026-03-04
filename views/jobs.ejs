@@ -4,28 +4,37 @@
       <h2>Your Jobs</h2>
       <a href="/jobs/new">New</a>
     </div>
-    <% jobs.forEach((job)=> {%>
-      <div>
-        <h3>
-          <%= job.position %>
-            [
-            <span style=" opacity: 80%;font-style: italic;">
-              <%= job.status %>
-            </span>]
-        </h3>
-        <div>
-          <span style=" opacity: 80%;">
+
+    <table>
+      <tr>
+        <th>Company</th>
+        <th>Position</th>
+        <th>Status</th>
+        <th colspan="2"></th>
+      </tr>
+      <% jobs.forEach((job)=> { %>
+        <tr>
+          <td>
             <%= job.company %>
-          </span>
-        </div>
+          </td>
+          <td>
+            <%= job.position %>
+          </td>
+          <td>
+            <%= job.status %>
+          </td>
+          <td>
+            <form action="/jobs/delete/<%= job._id  %>" method="post">
+              <button>delete</button>
+              <input type="hidden" name="_csrf" value="<%= _csrf %>" />
+            </form>
+          </td>
+          <td><a href="/jobs/edit/<%= job._id %>"><button>Edit</button></a></td>
+        </tr>
+        <% }) %>
+
+    </table>
 
 
-        <form action="/jobs/delete/<%= job._id  %>" method="post">
-          <div style="display: flex; justify-content: space-between; max-width: 100px;"> <button>delete</button> <a
-              href="/jobs/edit/<%= job._id %>">Edit</a></div>
-          <input type="hidden" name="_csrf" value="<%= _csrf %>" />
-        </form>
-      </div>
-      <%}) %>
 
-        <%- include("partials/footer.ejs") %>
+    <%- include("partials/footer.ejs") %>
