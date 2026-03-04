@@ -1,22 +1,31 @@
 <%- include("partials/head.ejs") %>
   <%- include("partials/header.ejs") %>
-    <h2>Create New Job</h2>
-    <p>Provide some details about the job</p>
-    <form method="post">
-      <input type="hidden" name="_csrf" value="<%= _csrf %>" />
-      <label for="company">Company</label><br />
-      <input type="text" required name="company" id="company"><br />
-      <label for="position">Position</label><br />
-      <input type="text" required name="position" id="position"><br />
-      <label for="status">Status</label><br />
-      <select name="status" id="status">
-        <option value="pending" selected>Pending</option>
-        <option value="interview">Interview</option>
-        <option value="declined">Declined</option>
-      </select>
+    <div style="display: flex; gap: 2rem; align-items: center;">
+      <h2>Your Jobs</h2>
+      <a href="/jobs/new">New</a>
+    </div>
+    <% jobs.forEach((job)=> {%>
       <div>
-        <button>Cancel</button>
-        <button type="submit">Create Job</button>
+        <h3>
+          <%= job.position %>
+            [
+            <span style=" opacity: 80%;font-style: italic;">
+              <%= job.status %>
+            </span>]
+        </h3>
+        <div>
+          <span style=" opacity: 80%;">
+            <%= job.company %>
+          </span>
+        </div>
+
+
+        <form action="/jobs/delete/<%= job._id  %>" method="post">
+          <div style="display: flex; justify-content: space-between; max-width: 100px;"> <button>delete</button> <a
+              href="/jobs/edit/<%= job._id %>">Edit</a></div>
+          <input type="hidden" name="_csrf" value="<%= _csrf %>" />
+        </form>
       </div>
-    </form>
-    <%- include("partials/footer.ejs") %>
+      <%}) %>
+
+        <%- include("partials/footer.ejs") %>
