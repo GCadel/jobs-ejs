@@ -1,0 +1,40 @@
+<%- include("partials/head.ejs") %>
+  <%- include("partials/header.ejs") %>
+    <div style="display: flex; gap: 2rem; align-items: center;">
+      <h2>Your Jobs</h2>
+      <a href="/jobs/new">New</a>
+    </div>
+
+    <table>
+      <tr>
+        <th>Company</th>
+        <th>Position</th>
+        <th>Status</th>
+        <th colspan="2"></th>
+      </tr>
+      <% jobs.forEach((job)=> { %>
+        <tr>
+          <td>
+            <%= job.company %>
+          </td>
+          <td>
+            <%= job.position %>
+          </td>
+          <td>
+            <%= job.status %>
+          </td>
+          <td>
+            <form action="/jobs/delete/<%= job._id  %>" method="post">
+              <button>delete</button>
+              <input type="hidden" name="_csrf" value="<%= _csrf %>" />
+            </form>
+          </td>
+          <td><a href="/jobs/edit/<%= job._id %>"><button>Edit</button></a></td>
+        </tr>
+        <% }) %>
+
+    </table>
+
+
+
+    <%- include("partials/footer.ejs") %>

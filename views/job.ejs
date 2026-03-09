@@ -1,0 +1,68 @@
+<%- include("partials/head.ejs") %>
+  <%- include("partials/header.ejs") %>
+    <%if (job) { %>
+      <h2>Editing Job
+      </h2>
+      <a href="/jobs">Back to jobs</a>
+      <form method="post" action="/jobs/edit/<%= job._id %>">
+        <input type="hidden" name="_csrf" value="<%= _csrf %>" />
+        <label for="company">Company</label><br />
+        <input type="text" required name="company" id="company" value="<%= job.company %>"><br />
+        <label for="position">Position</label><br />
+        <input type="text" required name="position" id="position" value="<%= job.position %>"><br />
+        <label for="status">Status</label><br />
+
+        <select name="status" id="status">
+          <div>
+            <% if(job.status=="pending" ) {%>
+              <option value="pending" selected>Pending</option>
+
+              <% } else {%>
+                <option value="pending">Pending</option>
+                <% } %>
+          </div>
+          <div>
+            <% if(job.status=="interview" ) {%>
+
+              <option value="interview" selected>Interview</option>
+
+              <% } else {%>
+                <option value="interview">Interview</option>
+                <% } %>
+          </div>
+          <div>
+            <% if(job.status=="declined" ) {%>
+
+              <option value="declined" selected>Declined</option>
+
+              <% } else {%>
+                <option value="declined">Declined</option>
+                <% } %>
+          </div>
+        </select>
+        <div>
+          <button type="submit">Edit Job</button>
+        </div>
+      </form>
+      <% } else { %>
+        <h2>Create Job</h2>
+        <a href="/jobs">Back to jobs</a>
+        <form method="post" action="/jobs">
+          <input type="hidden" name="_csrf" value="<%= _csrf %>" />
+          <label for="company">Company</label><br />
+          <input type="text" required name="company" id="company"><br />
+          <label for="position">Position</label><br />
+          <input type="text" required name="position" id="position"><br />
+          <label for="status">Status</label><br />
+          <select name="status" id="status">
+            <option value="pending">Pending</option>
+            <option value="interview">Interview</option>
+            <option value="declined">Declined</option>
+          </select>
+          <div>
+            <button type="submit">Create Job</button>
+          </div>
+        </form>
+        <% } %>
+
+          <%- include("partials/footer.ejs") %>
