@@ -62,6 +62,22 @@ app.use((req, res, next) => {
   next();
 });
 
+app.use((req, res, next) => {
+  if (req.path == "/multiply") {
+    res.set("Content-Type", "application/json");
+  } else {
+    res.set("Content-Type", "text/html");
+  }
+  next();
+});
+
+app.get("/multiply", (req, res) => {
+  const result = req.query.first * req.query.second;
+  if (result.isNaN) return res.json({ result: "NaN" });
+  else if (result == null) return res.json({ result: "null" });
+  return res.json({ result: result });
+});
+
 app.get("/", (req, res) => {
   res.render("index");
 });
@@ -82,11 +98,16 @@ app.use((err, req, res, next) => {
 });
 
 const port = process.env.PORT || 3000;
+let url = process.env.MONGO;
 
-const start = async () => {
+if (process.env.NODE_ENV == "test") {
+  url = process.env.MONGO_URI_TEST;
+}
+
+const start = () => {
   try {
-    await require("./db/connect")(process.env.MONGO);
-    app.listen(port, () =>
+    require("./db/connect")(url);
+    return app.listen(port, () =>
       console.log(`Server is listening on port ${port}...`),
     );
   } catch (error) {
@@ -95,3 +116,5 @@ const start = async () => {
 };
 
 start();
+
+module.exports = { app };
